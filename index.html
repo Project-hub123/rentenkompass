@@ -75,6 +75,12 @@ details ul{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--ink2);dis
 .rd{font-size:14px;color:var(--ink2);min-height:21px}.rd b{color:var(--ink);font-variant-numeric:tabular-nums}
 .cb{touch-action:pan-y;width:100%}
 .tip[hidden]{display:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--in);color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:13px;cursor:pointer}
+.chip:hover{border-color:var(--acc)}
+.blk{border:1px solid var(--line);border-left:4px solid var(--sw);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.bh{display:flex;justify-content:space-between;align-items:center}
+.x{border:0;background:none;color:var(--ink2);font-size:13px;cursor:pointer}.x:hover{color:var(--crit)}
 .demo{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn);font-size:13px;font-weight:600;padding:6px 10px;border-radius:8px}
 .hb{display:flex;gap:6px;flex-wrap:wrap}
 .ta{width:100%;min-height:84px;font:12px/1.4 ui-monospace,Consolas,monospace;color:var(--ink);background:var(--in);border:1px solid var(--line);border-radius:9px;padding:8px}
@@ -131,6 +137,7 @@ footer{max-width:1000px;margin:16px auto 0;font-size:12px;color:var(--ink2)}
     <div class="f"><label for="gv">Gesetzliche Rente</label><div class="w"><input id="gv" data-k="gv" inputmode="decimal"><span>€/Mon.</span></div></div>
     <div class="f"><label for="bav">Betriebsrente</label><div class="w"><input id="bav" data-k="bav" inputmode="decimal"><span>€/Mon.</span></div></div>
     <div class="f"><label for="priv">Private Rente</label><div class="w"><input id="priv" data-k="priv" inputmode="decimal"><span>€/Mon.</span></div></div>
+  <div class="f"><label for="oth">Weitere Einkünfte (z. B. Miete)</label><div class="w"><input id="oth" data-k="oth" inputmode="decimal"><span>€/Mon.</span></div></div>
   </div>
   <div class="hint">Werte aus Renteninformation bzw. Standmitteilung (brutto). Gesetzliche Rente: Regelaltersrente ohne angenommene Rentenanpassung.</div>
 </section>
@@ -138,15 +145,17 @@ footer{max-width:1000px;margin:16px auto 0;font-size:12px;color:var(--ink2)}
 <section class="card">
   <h2><i>3</i>Vermögen</h2>
   <div class="row">
-    <div class="f"><label for="etf">ETFs und Aktien</label><div class="w"><input id="etf" data-k="etf" inputmode="decimal"><span>€</span></div></div>
-    <div class="f"><label for="spar">Ersparnisse</label><div class="w"><input id="spar" data-k="spar" inputmode="decimal"><span>€</span></div></div>
+    <div class="f"><label for="etf">ETFs und Fonds</label><div class="w"><input id="etf" data-k="etf" inputmode="decimal"><span>€</span></div></div>
+    
     <div class="f"><label for="immo">Immobilienwert</label><div class="w"><input id="immo" data-k="immo" inputmode="decimal"><span>€</span></div></div>
     <div class="f"><label for="kred">Offener Kredit</label><div class="w"><input id="kred" data-k="kred" inputmode="decimal"><span>€</span></div></div>
-    <div class="f"><label for="rate">Sparrate (in ETF)</label><div class="w"><input id="rate" data-k="rate" inputmode="decimal"><span>€/Mon.</span></div></div>
+    <div class="f"><label for="rate">Sparrate ETF</label><div class="w"><input id="rate" data-k="rate" inputmode="decimal"><span>€/Mon.</span></div></div>
     <div class="f"><label for="et">Anlageart (ETF)</label><select id="et"><option value="welt">Welt-ETF</option><option value="misch">Misch-ETF</option><option value="anl">Anleihen-ETF</option><option value="eigene">Eigene</option></select></div>
     <div class="f"><label for="cost">Fondskosten</label><div class="w"><input id="cost" data-k="cost" inputmode="decimal"><span>% p. a.</span></div></div>
   </div>
   <div class="hint" id="etn"></div>
+  <div id="pos" style="display:flex;flex-direction:column;gap:10px"></div>
+  <div class="chips"><span class="hint">Weitere Geldanlage hinzufügen:</span><span class="chips" id="padd"></span></div>
   <label class="chk"><input type="checkbox" id="uimmo"> Immobilie im Alter verwerten (Verkauf)</label>
   <div class="pie"><div class="dn" id="dn"></div><div class="lg" id="lg"></div></div>
 </section>
@@ -163,7 +172,7 @@ footer{max-width:1000px;margin:16px auto 0;font-size:12px;color:var(--ink2)}
 
 <section class="card">
   <h2><i>5</i>Vermögensverlauf</h2>
-  <div class="hint">Kapital in heutiger Kaufkraft vor Steuern: Aufbau bis zur Rente, danach Auszahlung bis 90. Der Schatten zeigt die Bandbreite bei ±2 Prozentpunkten Rendite.</div>
+  <div class="hint">Kapital in heutiger Kaufkraft vor Steuern: Aufbau bis zur Rente, danach Auszahlung bis zum Planungsalter. Der Schatten zeigt die Bandbreite bei ±2 Prozentpunkten Rendite.</div>
   <div class="lg2" id="cl"></div>
   <div class="rd" id="rd"></div>
   <div class="cb" id="ch"></div>
@@ -174,10 +183,11 @@ footer{max-width:1000px;margin:16px auto 0;font-size:12px;color:var(--ink2)}
   <div class="f"><label for="infl">Inflation</label><div class="w"><input id="infl" data-k="infl" inputmode="decimal"><span>% p. a.</span></div></div>
   <div class="f"><label for="rend">Rendite ETF vor Kosten</label><div class="w"><input id="rend" data-k="rend" inputmode="decimal"><span>% p. a.</span></div></div>
   <div class="f"><label for="abz">Abzug Steuern &amp; Sozialabgaben</label><div class="w"><input id="abz" data-k="abz" inputmode="decimal"><span>%</span></div></div>
+  <div class="f"><label for="plan">Auszahlung bis Alter</label><div class="w"><input id="plan" data-k="plan" inputmode="numeric"><span>J.</span></div></div>
 </div>
 <ul>
-  <li>Ergebnisse in heutiger Kaufkraft. Das Kapital wird bis 90 gleichmäßig aufgebraucht (3 % Rendite in der Rentenphase).</li>
-  <li>Ersparnisse wachsen mit 2 % p. a. Gesetzliche Rente: −0,3 % je Monat vor 67, +0,5 % je Monat danach. Betriebs- und Privatrente werden um die Inflation gemindert.</li>
+  <li>Ergebnisse in heutiger Kaufkraft. Das Kapital wird bis zum Planungsalter gleichmäßig aufgebraucht (3 % Rendite in der Rentenphase).</li>
+  <li>Weitere Geldanlagen wachsen mit der eingetragenen Rendite (Vorschläge sind Modellannahmen). Gesetzliche Rente: −0,3 % je Monat vor 67, +0,5 % je Monat danach. Betriebs- und Privatrente werden um die Inflation gemindert.</li>
   <li>Steuern und Sozialabgaben (Kranken-/Pflegeversicherung) werden pauschal als Prozentabzug von allen Renteneinkünften angesetzt, Standard 15 %. Das ist eine grobe Annahme, die tatsächliche Belastung hängt vom Einzelfall ab. Modellrechnung, keine Anlageberatung.</li>
 </ul></details>
 <details class="card" id="dat"><summary>Daten sichern / auf ein anderes Gerät übertragen</summary>
@@ -195,17 +205,21 @@ footer{max-width:1000px;margin:16px auto 0;font-size:12px;color:var(--ink2)}
 <details><summary>Wo werden meine Daten gespeichert?</summary><p>Nur im Browser auf diesem Gerät. Es gibt keinen Server und nichts wird übertragen. Für einen Gerätewechsel nutze „Daten sichern“ ganz unten.</p></details>
 <details><summary>Ist das eine Anlageberatung?</summary><p>Nein. Der RentenKompass gibt Orientierung, keine Beratung. Für konkrete Entscheidungen hilft z. B. die Verbraucherzentrale oder eine Rentenberatung.</p></details>
 </dialog>
-<footer>RentenKompass · Prototyp Version 6 · Marketing-Seminar WiSe 2026/27 · Eingaben bleiben in deinem Browser.</footer>
+<footer>RentenKompass · Prototyp Version 7 · Marketing-Seminar WiSe 2026/27 · Eingaben bleiben in deinem Browser.</footer>
 
 <script>
 (function(){
 "use strict";
 var KEY="rk4",PAY=0.03,SPR=2,PLAN=90;
-var sample=function(){return{age:25,ret:67,wish:3600,inc:2000,gv:1200,bav:300,priv:200,etf:35000,spar:14500,immo:200000,kred:165000,rate:250,infl:2,rend:6,et:"welt",cost:0.2,abz:15,demo:1,ui:0,ex:0,sr:null}};
-var blank=function(){return{age:25,ret:67,wish:0,inc:0,gv:0,bav:0,priv:0,etf:0,spar:0,immo:0,kred:0,rate:0,infl:2,rend:6,et:"welt",cost:0.2,abz:15,ui:0,ex:0,sr:null}};
+var PT={tagesgeld:["Tagesgeld",2,"--c2"],sparbuch:["Sparbuch",0.5,"--c2"],festgeld:["Festgeld",2.5,"--c2"],anleihen:["Anleihen",2.5,"--c4"],aktien:["Einzelaktien",6,"--c1"],bargeld:["Girokonto / Bargeld",0,"--c3"],sonst:["Sonstiges",3,"--c5"]};
+var uid=function(){return"p"+Math.random().toString(36).slice(2,7)};
+var sample=function(){return{age:25,ret:67,wish:3600,inc:2000,gv:1200,bav:300,priv:200,etf:35000,spar:14500,immo:200000,kred:165000,rate:250,infl:2,rend:6,et:"welt",cost:0.2,abz:15,plan:90,oth:0,pos:[{id:"b1",t:"tagesgeld",s:14500,r:0,y:2}],demo:1,ui:0,ex:0,sr:null}};
+var blank=function(){return{age:25,ret:67,wish:0,inc:0,gv:0,bav:0,priv:0,etf:0,spar:0,immo:0,kred:0,rate:0,infl:2,rend:6,et:"welt",cost:0.2,abz:15,plan:90,oth:0,pos:[],ui:0,ex:0,sr:null}};
 var S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(x){S=null}
 if(!S||typeof S.age!=="number")S=sample();
 if(S.abz==null)S.abz=15;
+if(!Array.isArray(S.pos))S.pos=S.spar>0?[{id:"m1",t:"tagesgeld",s:S.spar,r:0,y:2}]:[];
+if(S.plan==null)S.plan=90;if(S.oth==null)S.oth=0;
 var save=function(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(x){}};
 var $=function(q){return document.querySelector(q)};
 var nf=new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0});
@@ -219,20 +233,22 @@ function calc(ret,ex,dr){
   var n=Math.max(0,ret-S.age),i=S.infl/100,defl=Math.pow(1+i,n),N=Math.max(12,(PLAN-ret)*12);
   var rr=(1+PAY)/(1+i)-1,rm=Math.pow(1+rr,1/12)-1,ann=rm===0?N:(1-Math.pow(1+rm,-N))/rm;
   var immoNet=Math.max(0,S.immo-S.kred);
-  var capNom=fv(S.etf,S.rate+ex,eff()+(dr||0),n)+fv(S.spar,0,SPR,n)+(S.ui?immoNet*defl:0);
+  var capNom=fv(S.etf,S.rate+ex,eff()+(dr||0),n)+posFv(n)+(S.ui?immoNet*defl:0);
   var capReal=capNom/defl;
-  var rent=S.gv*stat(ret)+(S.bav+S.priv)/defl;
-  var nf=1-cl(S.abz==null?15:S.abz,0,60)/100;var by={gv:S.gv*stat(ret)*nf,bav:S.bav/defl*nf,priv:S.priv/defl*nf,cap:capReal/ann*nf};
+  var rent=S.gv*stat(ret)+(S.bav+S.priv)/defl+(S.oth||0);
+  var nf=1-cl(S.abz==null?15:S.abz,0,60)/100;var by={gv:S.gv*stat(ret)*nf,bav:S.bav/defl*nf,priv:S.priv/defl*nf,cap:capReal/ann*nf,oth:(S.oth||0)*nf};
   var tot=(rent+capReal/ann)*nf,w=Math.max(0,S.wish);
   return{by:by,tot:tot,w:w,gap:w-tot,score:w>0?Math.round(Math.min(tot/w,1)*100):0,capNom:capNom,capReal:capReal,n:n,defl:defl,ann:ann,nf:nf};
 }
-var NAMES=[["gv","Gesetzliche Rente","--c1"],["bav","Betriebsrente","--c4"],["priv","Private Rente","--c5"],["cap","Kapital (ETF, Ersparnisse)","--c2"]];
+var NAMES=[["gv","Gesetzliche Rente","--c1"],["bav","Betriebsrente","--c4"],["priv","Private Rente","--c5"],["oth","Weitere Einkünfte","--c3"],["cap","Kapital (Geldanlagen)","--c2"]];
+function posFv(t){return(S.pos||[]).reduce(function(a,p){return a+fv(p.s||0,p.r||0,p.y||0,t)},0)}
+function posUI(){$("#pos").innerHTML=(S.pos||[]).map(function(p){var t=PT[p.t]||PT.sonst,f=function(k,l,u){return '<div class="f"><label>'+l+'</label><div class="w"><input inputmode="decimal" data-f="'+k+'" aria-label="'+t[0]+' '+l+'" value="'+show(p[k])+'"><span>'+u+'</span></div></div>'};return '<div class="blk" data-id="'+p.id+'" style="--sw:var('+t[2]+')"><div class="bh"><b>'+t[0]+'</b><button class="x" type="button" data-rm="'+p.id+'">Entfernen</button></div><div class="row">'+f("s","Aktuell","€")+f("r","Sparrate","€/Mon.")+f("y","Rendite","% p. a.")+'</div></div>'}).join("")}
 function col(s){return s>=90?"var(--good)":s>=60?"var(--warn)":"var(--crit)"}
 function eff(){return S.rend-(S.cost||0)}
 var ET={welt:[6,0.2],misch:[4,0.3],anl:[2.5,0.15]};
 function fk(v){return v>=1e6?(v/1e6).toLocaleString("de-DE",{maximumFractionDigits:1})+" Mio. €":v>=1000?Math.round(v/1000).toLocaleString("de-DE")+" Tsd. €":Math.round(v)+" €"}
 function series(ret,ex,dr){var n=Math.max(0,ret-S.age),i=S.infl/100,out=[],t,im=Math.max(0,S.immo-S.kred);
-  for(t=0;t<=n;t++){var d=Math.pow(1+i,t);out.push({age:S.age+t,v:(fv(S.etf,S.rate+ex,eff()+(dr||0),t)+fv(S.spar,0,SPR,t)+(S.ui?im*d:0))/d})}
+  for(t=0;t<=n;t++){var d=Math.pow(1+i,t);out.push({age:S.age+t,v:(fv(S.etf,S.rate+ex,eff()+(dr||0),t)+posFv(t)+(S.ui?im*d:0))/d})}
   var c=calc(ret,ex,dr),rr=(1+PAY)/(1+i)-1,rm=Math.pow(1+rr,1/12)-1,pay=c.capReal/c.ann,bal=c.capReal,y,k;
   for(y=1;y<=PLAN-ret;y++){for(k=0;k<12;k++)bal=bal*(1+rm)-pay;out.push({age:ret+y,v:Math.max(0,bal)})}
   return{d:out,ret:ret,peak:c.capReal}}
@@ -266,6 +282,7 @@ function hov(e){if(!CH)return;var svg=$("#ch svg");if(!svg)return;var r=svg.getB
   $("#rd").innerHTML="Alter <b>"+age+"</b>"+CH.ss.map(function(q){var p=q.s.d.filter(function(d){return d.age===age})[0];return " · "+q.n+": <b>"+(p?eur(p.v):"–")+"</b>"}).join("")+(function(){var l=CH.BL.d.filter(function(d){return d.age===age})[0],h=CH.BH.d.filter(function(d){return d.age===age})[0];return l&&h?" · Spanne "+eur(l.v)+" bis "+eur(h.v):""})()}
 function update(){
   var ret=cl(Math.round(S.ret||67),50,75),sr=S.sr==null?cl(ret,63,70):S.sr;
+  PLAN=cl(Math.round(S.plan||90),Math.max(ret,sr)+5,110);
   var a=calc(ret,0),b=calc(sr,S.ex),diff=sr!==ret||S.ex>0;
   $("#demo").hidden=!S.demo;$("#se").value=S.ex;$("#sr").value=sr;$("#sev").textContent="+"+eur(S.ex)+" / Mon.";$("#srv").textContent=sr+" Jahre";
   document.documentElement.style.setProperty("--st",col(a.score));
@@ -288,7 +305,7 @@ function update(){
   $("#cmp").innerHTML='<div>Einkommen<b>'+eur(b.tot)+'</b>'+d(a.tot,b.tot)+'</div><div>'+(b.gap>0.5?"Lücke":"Puffer")+'<b>'+eur(Math.abs(b.gap))+'</b>'+(diff?"vorher "+(a.gap>0.5?eur(a.gap):"–"):"")+'</div><div>Score<b>'+(b.w>0?b.score:"–")+'</b>'+(diff?"vorher "+a.score:"")+'</div>';
   $("#vn").textContent=eur(b.capNom);$("#vk").textContent=eur(b.capReal);
   $("#quote").textContent=S.inc>0&&S.rate>=0?"Sparquote: "+(S.rate/S.inc*100).toLocaleString("de-DE",{maximumFractionDigits:1})+" % deines Nettoeinkommens"+(ok?" · noch "+(ret-S.age)+" Jahre bis zur Rente":""):"";
-  var im=Math.max(0,S.immo-S.kred),parts=[["ETFs und Aktien",S.etf,"--c1"],["Ersparnisse",S.spar,"--c2"],["Immobilie (netto)",im,"--c3"]],T=parts.reduce(function(s,x){return s+x[1]},0);
+  var im=Math.max(0,S.immo-S.kred),parts=[["ETFs und Fonds",S.etf,"--c1"],["Weitere Anlagen",(S.pos||[]).reduce(function(a,p){return a+(p.s||0)},0),"--c2"],["Immobilie (netto)",im,"--c3"]],T=parts.reduce(function(s,x){return s+x[1]},0);
   var C=2*Math.PI*42,acc2=0,cnt=parts.filter(function(x){return x[1]>0}).length,sg2="";
   parts.forEach(function(x){if(x[1]<=0||T<=0)return;var l=x[1]/T*C,gp=cnt>1?2.5:0;sg2+='<circle cx="60" cy="60" r="42" fill="none" stroke="var('+x[2]+')" stroke-width="16" stroke-dasharray="'+Math.max(0,l-gp)+' '+C+'" stroke-dashoffset="'+(-acc2)+'"><title>'+x[0]+': '+eur(x[1])+'</title></circle>';acc2+=l});
   var te=eur(T);
@@ -304,7 +321,7 @@ $("#et").onchange=function(){var v=this.value;S.et=v;if(ET[v]){S.rend=ET[v][0];S
 $("#uimmo").onchange=function(){S.ui=this.checked?1:0;save();update()};
 $("#se").oninput=function(){S.ex=+this.value;save();update()};
 $("#sr").oninput=function(){S.sr=+this.value;save();update()};
-function fill(){document.querySelectorAll("[data-k]").forEach(function(el){el.value=show(S[el.dataset.k])});$("#uimmo").checked=!!S.ui;$("#et").value=S.et||"eigene"}
+function fill(){document.querySelectorAll("[data-k]").forEach(function(el){el.value=show(S[el.dataset.k])});$("#uimmo").checked=!!S.ui;$("#et").value=S.et||"eigene";posUI()}
 $("#bs").onclick=function(){S=sample();save();fill();update()};
 $("#bc").onclick=function(){S=blank();save();fill();update()};
 var TH="auto";try{TH=localStorage.getItem("rk4t")||"auto"}catch(e){}
@@ -315,14 +332,15 @@ var hp=$("#hp");
 $("#bh").onclick=function(){if(hp.showModal)hp.showModal();else hp.setAttribute("open","")};
 $("#hx").onclick=function(){if(hp.close)hp.close();else hp.removeAttribute("open")};
 hp.addEventListener("click",function(e){if(e.target===hp&&hp.close)hp.close()});
-var NK=["age","ret","wish","inc","gv","bav","priv","etf","spar","immo","kred","rate","infl","rend","cost","abz","ui","ex"];
+var NK=["age","ret","wish","inc","gv","bav","priv","etf","spar","immo","kred","rate","infl","rend","cost","abz","plan","oth","ui","ex"];
 var msg=function(t){$("#dm").textContent=t};
 function cp(c){return(navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(c):Promise.reject()).then(function(){return true},function(){try{return document.execCommand("copy")}catch(e){return false}})}
-$("#dx").onclick=function(){var o={};NK.forEach(function(k){o[k]=S[k]});o.et=S.et||"eigene";var c="RK1:"+JSON.stringify(o);$("#dt").value=c;$("#dt").select();cp(c).then(function(ok){msg(ok?"Code kopiert. Speichere ihn z. B. in einer Notiz.":"Code erstellt. Bitte markieren, kopieren und irgendwo speichern.")})};
+$("#dx").onclick=function(){var o={};NK.forEach(function(k){o[k]=S[k]});o.pos=S.pos||[];o.et=S.et||"eigene";var c="RK1:"+JSON.stringify(o);$("#dt").value=c;$("#dt").select();cp(c).then(function(ok){msg(ok?"Code kopiert. Speichere ihn z. B. in einer Notiz.":"Code erstellt. Bitte markieren, kopieren und irgendwo speichern.")})};
 $("#di").onclick=function(){var t=$("#dt").value.trim().replace(/^RK1:/,""),o;try{o=JSON.parse(t)}catch(e){msg("Das ist kein gültiger Sicherungscode.");return}
   if(!o||typeof o!=="object"){msg("Das ist kein gültiger Sicherungscode.");return}
   var n=blank(),c=0;NK.forEach(function(k){var v=o[k];if(typeof v==="number"&&isFinite(v)){n[k]=cl(v,0,1e9);c++}});
   if(!c){msg("Keine passenden Werte gefunden.");return}
+  n.pos=Array.isArray(o.pos)?o.pos.slice(0,12).filter(function(p){return p&&PT[p.t]}).map(function(p){return{id:uid(),t:p.t,s:cl(+p.s||0,0,1e9),r:cl(+p.r||0,0,1e6),y:cl(+p.y||0,0,30)}}):(+o.spar>0?[{id:uid(),t:"tagesgeld",s:cl(+o.spar,0,1e9),r:0,y:2}]:[]);
   n.et=["welt","misch","anl","eigene"].indexOf(o.et)>=0?o.et:"eigene";n.ui=n.ui?1:0;n.ex=cl(n.ex,0,1000);n.sr=null;
   S=n;save();fill();update();msg("Daten übernommen.")};
 function splash(){var o=document.getElementById("sp");if(o)o.remove();
@@ -332,6 +350,11 @@ function splash(){var o=document.getElementById("sp");if(o)o.remove();
   var rm=function(){if(d.parentNode)d.remove()};d.onclick=rm;document.body.appendChild(d);setTimeout(rm,3200)}
 $("#logo").onclick=splash;
 var seen=false;try{seen=sessionStorage.getItem("rk4s")==="1";sessionStorage.setItem("rk4s","1")}catch(e){}
+$("#padd").innerHTML=Object.keys(PT).map(function(k){return '<button class="chip" type="button" data-add="'+k+'"><i class="dot" style="--sw:var('+PT[k][2]+')"></i>'+PT[k][0]+'</button>'}).join("");
+document.addEventListener("input",function(e){var el=e.target,f=el.dataset.f,b=el.closest(".blk");if(!f||!b)return;var p=(S.pos||[]).filter(function(x){return x.id===b.dataset.id})[0];if(!p)return;p[f]=num(el.value);S.demo=0;save();update()});
+document.addEventListener("click",function(e){var a=e.target.closest("[data-add]"),r=e.target.closest("[data-rm]");
+  if(a){S.pos=S.pos||[];S.pos.push({id:uid(),t:a.dataset.add,s:0,r:0,y:PT[a.dataset.add][1]});S.demo=0;save();posUI();update();var i=document.querySelector("#pos .blk:last-child input");if(i)i.focus()}
+  else if(r){S.pos=(S.pos||[]).filter(function(x){return x.id!==r.dataset.rm});save();posUI();update()}});
 fill();update();
 if(!seen)splash();
 })();
