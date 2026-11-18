@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>RentenKompass</title>
+<meta name="theme-color" content="#101827">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="RentenKompass">
+
+<style>
+:root{--bg:#101827;--hd:#172438;--card:#1b293d;--in:#111d2e;--line:#2b3b50;--ink:#f1f5f9;--ink2:#a9b7c9;--acc:#45d6b5;
+--good:#34d399;--warn:#fbbf24;--crit:#f87171;--c1:#38bdf8;--c2:#34d399;--c3:#fbbf24;--c4:#a78bfa;--c5:#fb7185;
+color-scheme:dark light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root{--bg:#eef2f6;--hd:#fff;--card:#fff;--in:#f1f5f9;--line:#d5dde6;--ink:#10202b;--ink2:#51606e;--acc:#0b7d68;--good:#0f7a2e;--warn:#a96d00;--crit:#b8322f}}
+:root[data-theme="dark"]{--bg:#101827;--hd:#172438;--card:#1b293d;--in:#111d2e;--line:#2b3b50;--ink:#f1f5f9;--ink2:#a9b7c9;--acc:#45d6b5;--good:#34d399;--warn:#fbbf24;--crit:#f87171;color-scheme:dark}
+:root[data-theme="light"]{--bg:#eef2f6;--hd:#fff;--card:#fff;--in:#f1f5f9;--line:#d5dde6;--ink:#10202b;--ink2:#51606e;--acc:#0b7d68;--good:#0f7a2e;--warn:#a96d00;--crit:#b8322f;color-scheme:light}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;padding:0 max(14px,env(safe-area-inset-right,0px)) 40px max(14px,env(safe-area-inset-left,0px))}
+header{max-width:1000px;margin:0 auto;padding:16px 0;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.logo{font-size:21px;font-weight:700;color:var(--acc)}
+.app{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+h2{margin:0;font-size:16px}h2 i{font-style:normal;color:var(--acc);margin-right:6px;font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.f{display:flex;flex-direction:column;gap:3px;min-width:0}
+.f label{font-size:12.5px;color:var(--ink2)}
+.w{position:relative}
+.w input{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--in);border:1px solid var(--line);border-radius:9px;padding:10px 44px 10px 11px}
+.w span{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--ink2);pointer-events:none}
+input:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.hint{font-size:12.5px;color:var(--ink2)}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--in);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:13px}
+.btn:hover{border-color:var(--acc)}
+.btn.p{background:var(--acc);border-color:var(--acc);color:#06241d;font-weight:700}
+.hero{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:5;box-shadow:0 8px 24px rgba(0,0,0,.25);background:linear-gradient(120deg,var(--card),color-mix(in srgb,var(--card) 80%,var(--acc)))}
+.top{display:flex;align-items:center;gap:16px}
+.ring{width:100px;height:100px;flex:none;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .n{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.ring b{font-size:30px}.ring small{font-size:11px;color:var(--ink2);margin-top:3px}
+.big{font-size:28px;font-weight:700;color:var(--acc);line-height:1.1}
+.pill{display:inline-block;margin-top:6px;font-weight:700;font-size:13.5px;padding:4px 10px;border-radius:8px;color:var(--st);background:color-mix(in srgb,var(--st) 15%,transparent)}
+.track{position:relative;height:22px;display:flex;gap:2px;margin-top:4px}
+.seg{height:100%;background:var(--sw);transition:width .3s}
+.seg:first-child{border-radius:6px 0 0 6px}.seg:last-child{border-radius:0 6px 6px 0}.seg:only-child{border-radius:6px}
+.gap{background:repeating-linear-gradient(135deg,transparent 0 5px,var(--ink2) 5px 6px);outline:1px dashed var(--ink2);outline-offset:-1px}
+.wish{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--ink)}
+.rr{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink2)}
+.rr b{color:var(--ink);font-variant-numeric:tabular-nums}
+.rr.t{border:0;color:var(--acc);font-weight:700;font-size:16px}.rr.t b{color:var(--acc)}
+.pie{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.pc{width:110px;height:110px;border-radius:50%;flex:none}
+.lg{font-size:13.5px;display:flex;flex-direction:column;gap:4px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px;background:var(--sw)}
+.tip{background:color-mix(in srgb,var(--acc) 14%,transparent);border-radius:10px;padding:10px 12px;font-size:14px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.sl .h{display:flex;justify-content:space-between;font-weight:600;font-size:14px}.sl .h span{color:var(--c4);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--c4);height:28px}
+.cmp{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.cmp div{border-top:2px solid var(--line);padding-top:6px;font-size:12px;color:var(--ink2)}
+.cmp b{display:block;font-size:18px;color:var(--ink)}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--ink2)}
+.chk input{width:20px;height:20px;accent-color:var(--acc)}
+details summary{cursor:pointer;color:var(--acc);font-size:13.5px}
+details ul{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--ink2);display:flex;flex-direction:column;gap:4px}
+.dn{width:150px;height:150px;flex:none}.dn svg{width:100%;height:100%}
+.dn circle{transition:opacity .2s}.dn circle:hover{opacity:.8}
+.lg2{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13.5px;color:var(--ink2)}
+.rd{font-size:14px;color:var(--ink2);min-height:21px}.rd b{color:var(--ink);font-variant-numeric:tabular-nums}
+.cb{touch-action:pan-y;width:100%}
+.tip[hidden]{display:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--in);color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:13px;cursor:pointer}
+.chip:hover{border-color:var(--acc)}
+.blk{border:1px solid var(--line);border-left:4px solid var(--sw);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.bh{display:flex;justify-content:space-between;align-items:center}
+.x{border:0;background:none;color:var(--ink2);font-size:13px;cursor:pointer}.x:hover{color:var(--crit)}
+.demo{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn);font-size:13px;font-weight:600;padding:6px 10px;border-radius:8px}
+.hb{display:flex;gap:6px;flex-wrap:wrap}
+.ta{width:100%;min-height:84px;font:12px/1.4 ui-monospace,Consolas,monospace;color:var(--ink);background:var(--in);border:1px solid var(--line);border-radius:9px;padding:8px}
+dialog{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:16px;width:calc(100% - 28px);max-width:560px;max-height:85vh;overflow:auto;padding:16px}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+.dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+dialog details{border-top:1px solid var(--line);padding:9px 0}
+dialog summary{font-size:15px;font-weight:600;color:var(--ink)}
+dialog p{margin:6px 0 0;font-size:14px;color:var(--ink2)}
+#sp{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;cursor:pointer;animation:spOut .5s ease 2.6s forwards}
+#sp .sr{animation:spDraw 1s ease-out .1s forwards}
+#sp .sn{transform-origin:60px 60px;animation:spSpin 1.7s cubic-bezier(.2,.7,.2,1) .15s both}
+#sp .st{font-size:28px;font-weight:700;color:var(--ink);white-space:nowrap;max-width:100%;opacity:0;animation:spTxt .8s ease 1.3s forwards}
+#sp .st b{color:var(--acc)}
+@keyframes spDraw{to{stroke-dashoffset:0}}
+@keyframes spSpin{0%{transform:rotate(0)}70%{transform:rotate(1100deg)}85%{transform:rotate(1068deg)}100%{transform:rotate(1080deg)}}
+@keyframes spTxt{from{opacity:0;letter-spacing:.15em;transform:translateY(8px)}to{opacity:1;letter-spacing:0;transform:none}}
+@keyframes spOut{to{opacity:0;visibility:hidden}}
+@media (prefers-reduced-motion:reduce){#sp{display:none}}
+details.card{gap:0}
+@media (max-width:760px){.hero{position:static;box-shadow:none}header{flex-wrap:wrap}.logo{font-size:18px;white-space:nowrap}.btn{padding:6px 9px}}
+.ax{font-size:11px;fill:var(--ink2)}
+.f select{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--in);border:1px solid var(--line);border-radius:9px;padding:10px 8px}
+footer{max-width:1000px;margin:16px auto 0;font-size:12px;color:var(--ink2)}
+</style></head><body>
+<header><div class="logo" id="logo" title="Intro abspielen" style="cursor:pointer">◆ RentenKompass</div><div class="hb"><button class="btn" id="bs" type="button">Beispiel</button><button class="btn" id="bc" type="button">Leeren</button><button class="btn" id="bt" type="button" aria-label="Darstellung wechseln">◐ Auto</button><button class="btn" id="bh" type="button" aria-label="Hilfe">?</button></div></header>
+<div class="app">
+
+<section class="card hero" aria-live="polite">
+  <div class="demo" id="demo" hidden>Beispieldaten · überschreibe sie mit deinen Werten oder tippe auf „Leeren“</div>
+  <div class="top">
+    <div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--line)" stroke-width="12"/><circle id="arc" cx="60" cy="60" r="52" fill="none" stroke="var(--st)" stroke-width="12" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" style="transition:stroke-dashoffset .5s"/></svg><div class="n"><b id="sc">–</b><small>von 100</small></div></div>
+    <div><div class="big" id="tot">–</div><div class="hint">pro Monat im Ruhestand (netto, heutige Kaufkraft)</div><span class="pill" id="pill"></span></div>
+  </div>
+  <div id="bar"></div>
+  <div class="tip" id="tip" hidden></div>
+</section>
+
+<div class="grid">
+<section class="card">
+  <h2><i>1</i>Du</h2>
+  <div class="row">
+    <div class="f"><label for="age">Alter heute</label><div class="w"><input id="age" data-k="age" inputmode="numeric"><span>J.</span></div></div>
+    <div class="f"><label for="ret">Rente mit</label><div class="w"><input id="ret" data-k="ret" inputmode="numeric"><span>J.</span></div></div>
+    <div class="f"><label for="wish">Wunscheinkommen im Alter (netto)</label><div class="w"><input id="wish" data-k="wish" inputmode="decimal"><span>€/Mon.</span></div></div>
+    <div class="f"><label for="inc">Nettoeinkommen heute</label><div class="w"><input id="inc" data-k="inc" inputmode="decimal"><span>€/Mon.</span></div></div>
+  </div>
+  <div class="hint" id="quote"></div>
+</section>
+
+<section class="card">
+  <h2><i>2</i>Altersvorsorge</h2>
+  <div class="row">
+    <div class="f"><label for="gv">Gesetzliche Rente</label><div class="w"><input id="gv" data-k="gv" inputmode="decimal"><span>€/Mon.</span></div></div>
+    <div class="f"><label for="bav">Betriebsrente</label><div class="w"><input id="bav" data-k="bav" inputmode="decimal"><span>€/Mon.</span></div></div>
+    <div class="f"><label for="priv">Private Rente</label><div class="w"><input id="priv" data-k="priv" inputmode="decimal"><span>€/Mon.</span></div></div>
+  <div class="f"><label for="oth">Weitere Einkünfte (z. B. Miete)</label><div class="w"><input id="oth" data-k="oth" inputmode="decimal"><span>€/Mon.</span></div></div>
+  </div>
+  <div class="hint">Werte aus Renteninformation bzw. Standmitteilung (brutto). Gesetzliche Rente: Regelaltersrente ohne angenommene Rentenanpassung.</div>
+</section>
+
+<section class="card">
+  <h2><i>3</i>Vermögen</h2>
+  <div class="row">
+    <div class="f"><label for="etf">ETFs und Fonds</label><div class="w"><input id="etf" data-k="etf" inputmode="decimal"><span>€</span></div></div>
+    
+    <div class="f"><label for="immo">Immobilienwert</label><div class="w"><input id="immo" data-k="immo" inputmode="decimal"><span>€</span></div></div>
+    <div class="f"><label for="kred">Offener Kredit</label><div class="w"><input id="kred" data-k="kred" inputmode="decimal"><span>€</span></div></div>
+    <div class="f"><label for="rate">Sparrate ETF</label><div class="w"><input id="rate" data-k="rate" inputmode="decimal"><span>€/Mon.</span></div></div>
+    <div class="f"><label for="et">Anlageart (ETF)</label><select id="et"><option value="welt">Welt-ETF</option><option value="misch">Misch-ETF</option><option value="anl">Anleihen-ETF</option><option value="eigene">Eigene</option></select></div>
+    <div class="f"><label for="cost">Fondskosten</label><div class="w"><input id="cost" data-k="cost" inputmode="decimal"><span>% p. a.</span></div></div>
+  </div>
+  <div class="hint" id="etn"></div>
+  <div id="pos" style="display:flex;flex-direction:column;gap:10px"></div>
+  <div class="chips"><span class="hint">Weitere Geldanlage hinzufügen:</span><span class="chips" id="padd"></span></div>
+  <label class="chk"><input type="checkbox" id="uimmo"> Immobilie im Alter verwerten (Verkauf)</label>
+  <div class="pie"><div class="dn" id="dn"></div><div class="lg" id="lg"></div></div>
+</section>
+
+<section class="card">
+  <h2><i>4</i>Was wäre, wenn …</h2>
+  <div class="sl"><div class="h"><label for="se">Mehr sparen</label><span id="sev"></span></div><input type="range" id="se" min="0" max="1000" step="25"></div>
+  <div class="sl"><div class="h"><label for="sr">Rente mit</label><span id="srv"></span></div><input type="range" id="sr" min="63" max="70" step="1"></div>
+  <div class="cmp" id="cmp"></div>
+  <div class="rr"><span>Vermögen bei Rentenbeginn</span><b id="vn">–</b></div>
+  <div class="rr"><span>… in heutiger Kaufkraft</span><b id="vk">–</b></div>
+</section>
+</div>
+
+<section class="card">
+  <h2><i>5</i>Vermögensverlauf</h2>
+  <div class="hint">Kapital in heutiger Kaufkraft vor Steuern: Aufbau bis zur Rente, danach Auszahlung bis zum Planungsalter. Der Schatten zeigt die Bandbreite bei ±2 Prozentpunkten Rendite.</div>
+  <div class="lg2" id="cl"></div>
+  <div class="rd" id="rd"></div>
+  <div class="cb" id="ch"></div>
+</section>
+
+<details class="card"><summary>Annahmen</summary>
+<div class="row" style="margin-top:8px">
+  <div class="f"><label for="infl">Inflation</label><div class="w"><input id="infl" data-k="infl" inputmode="decimal"><span>% p. a.</span></div></div>
+  <div class="f"><label for="rend">Rendite ETF vor Kosten</label><div class="w"><input id="rend" data-k="rend" inputmode="decimal"><span>% p. a.</span></div></div>
+  <div class="f"><label for="abz">Abzug Steuern &amp; Sozialabgaben</label><div class="w"><input id="abz" data-k="abz" inputmode="decimal"><span>%</span></div></div>
+  <div class="f"><label for="plan">Auszahlung bis Alter</label><div class="w"><input id="plan" data-k="plan" inputmode="numeric"><span>J.</span></div></div>
+</div>
+<ul>
+  <li>Ergebnisse in heutiger Kaufkraft. Das Kapital wird bis zum Planungsalter gleichmäßig aufgebraucht (3 % Rendite in der Rentenphase).</li>
+  <li>Weitere Geldanlagen wachsen mit der eingetragenen Rendite (Vorschläge sind Modellannahmen). Gesetzliche Rente: −0,3 % je Monat vor 67, +0,5 % je Monat danach. Betriebs- und Privatrente werden um die Inflation gemindert.</li>
+  <li>Steuern und Sozialabgaben (Kranken-/Pflegeversicherung) werden pauschal als Prozentabzug von allen Renteneinkünften angesetzt, Standard 15 %. Das ist eine grobe Annahme, die tatsächliche Belastung hängt vom Einzelfall ab. Modellrechnung, keine Anlageberatung.</li>
+</ul></details>
+<details class="card" id="dat"><summary>Daten sichern / auf ein anderes Gerät übertragen</summary>
+<div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+<div class="hint">Alles bleibt auf deinem Gerät. Mit dem Sicherungscode nimmst du deine Eingaben mit, z. B. aufs neue Handy.</div>
+<textarea class="ta" id="dt" aria-label="Sicherungscode" placeholder="Code hier einfügen und auf „Übernehmen“ tippen"></textarea>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn p" id="dx" type="button">Code erstellen &amp; kopieren</button><button class="btn" id="di" type="button">Übernehmen</button></div>
+<div class="hint" id="dm" aria-live="polite"></div></div></details>
+</div>
+<dialog id="hp" aria-label="Hilfe"><div class="dh"><h2>Hilfe</h2><button class="btn" id="hx" type="button">Schließen</button></div>
+<details open><summary>Wo finde ich meine Werte?</summary><p>Gesetzliche Rente: Renteninformation der Deutschen Rentenversicherung (kommt jährlich per Post, auch online abrufbar). Dort stehen meist mehrere Beträge. Nimm den Betrag zur Regelaltersrente ohne angenommene Rentenanpassung, bei Unsicherheit den niedrigeren. Betriebs- und Privatrente: Standmitteilung deines Anbieters. Fehlt ein Wert, trage 0 ein oder lass das Feld leer.</p></details>
+<details><summary>Was bedeutet der Score?</summary><p>Er zeigt, wie viel deines Wunscheinkommens im Alter gedeckt ist. 100 heißt voll gedeckt. Grün ab 90, Gelb ab 60, darunter Rot.</p></details>
+<details><summary>Warum „heutige Kaufkraft“?</summary><p>Alle Beträge sind in heutigen Euro angegeben, die Inflation (Annahme: 2 % pro Jahr) ist herausgerechnet. So kannst du sie direkt mit deinem heutigen Wunscheinkommen vergleichen.</p></details>
+<details><summary>Wie genau ist die Rechnung?</summary><p>Es ist eine Modellrechnung. Rendite und Inflation sind Annahmen, die du unter „Annahmen“ ändern kannst. Steuern und Sozialabgaben sind nur als einstellbarer Pauschalabzug berücksichtigt, Fondskosten schon. Sie zeigt Größenordnungen, keine Prognose.</p></details>
+<details><summary>Wo werden meine Daten gespeichert?</summary><p>Nur im Browser auf diesem Gerät. Es gibt keinen Server und nichts wird übertragen. Für einen Gerätewechsel nutze „Daten sichern“ ganz unten.</p></details>
+<details><summary>Ist das eine Anlageberatung?</summary><p>Nein. Der RentenKompass gibt Orientierung, keine Beratung. Für konkrete Entscheidungen hilft z. B. die Verbraucherzentrale oder eine Rentenberatung.</p></details>
+</dialog>
+<footer>RentenKompass · Prototyp Version 7 · Marketing-Seminar WiSe 2026/27 · Eingaben bleiben in deinem Browser.</footer>
+
+<script>
+(function(){
+"use strict";
+var KEY="rk4",PAY=0.03,SPR=2,PLAN=90;
+var PT={tagesgeld:["Tagesgeld",2,"--c2"],sparbuch:["Sparbuch",0.5,"--c2"],festgeld:["Festgeld",2.5,"--c2"],anleihen:["Anleihen",2.5,"--c4"],aktien:["Einzelaktien",6,"--c1"],bargeld:["Girokonto / Bargeld",0,"--c3"],sonst:["Sonstiges",3,"--c5"]};
+var uid=function(){return"p"+Math.random().toString(36).slice(2,7)};
+var sample=function(){return{age:25,ret:67,wish:3600,inc:2000,gv:1200,bav:300,priv:200,etf:35000,spar:14500,immo:200000,kred:165000,rate:250,infl:2,rend:6,et:"welt",cost:0.2,abz:15,plan:90,oth:0,pos:[{id:"b1",t:"tagesgeld",s:14500,r:0,y:2}],demo:1,ui:0,ex:0,sr:null}};
+var blank=function(){return{age:25,ret:67,wish:0,inc:0,gv:0,bav:0,priv:0,etf:0,spar:0,immo:0,kred:0,rate:0,infl:2,rend:6,et:"welt",cost:0.2,abz:15,plan:90,oth:0,pos:[],ui:0,ex:0,sr:null}};
+var S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(x){S=null}
+if(!S||typeof S.age!=="number")S=sample();
+if(S.abz==null)S.abz=15;
+if(!Array.isArray(S.pos))S.pos=S.spar>0?[{id:"m1",t:"tagesgeld",s:S.spar,r:0,y:2}]:[];
+if(S.plan==null)S.plan=90;if(S.oth==null)S.oth=0;
+var save=function(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(x){}};
+var $=function(q){return document.querySelector(q)};
+var nf=new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0});
+var eur=function(v){return nf.format(Math.round(v))};
+var num=function(s){s=String(s==null?"":s).trim().replace(/\s|€|%/g,"");if(s.indexOf(",")>=0)s=s.replace(/\./g,"").replace(",",".");var n=parseFloat(s);return isFinite(n)?n:0};
+var show=function(v){return v?String(v).replace(".",","):""};
+var cl=function(v,a,b){return Math.min(b,Math.max(a,v))};
+function fv(st,r,pct,y){var q=pct/100,rm=Math.pow(1+q,1/12)-1,m=y*12;return st*Math.pow(1+q,y)+(rm===0?r*m:r*(Math.pow(1+rm,m)-1)/rm)}
+function stat(ret){var m=(ret-67)*12;return m<0?1+0.003*m:1+0.005*m}
+function calc(ret,ex,dr){
+  var n=Math.max(0,ret-S.age),i=S.infl/100,defl=Math.pow(1+i,n),N=Math.max(12,(PLAN-ret)*12);
+  var rr=(1+PAY)/(1+i)-1,rm=Math.pow(1+rr,1/12)-1,ann=rm===0?N:(1-Math.pow(1+rm,-N))/rm;
+  var immoNet=Math.max(0,S.immo-S.kred);
+  var capNom=fv(S.etf,S.rate+ex,eff()+(dr||0),n)+posFv(n)+(S.ui?immoNet*defl:0);
+  var capReal=capNom/defl;
+  var rent=S.gv*stat(ret)+(S.bav+S.priv)/defl+(S.oth||0);
+  var nf=1-cl(S.abz==null?15:S.abz,0,60)/100;var by={gv:S.gv*stat(ret)*nf,bav:S.bav/defl*nf,priv:S.priv/defl*nf,cap:capReal/ann*nf,oth:(S.oth||0)*nf};
+  var tot=(rent+capReal/ann)*nf,w=Math.max(0,S.wish);
+  return{by:by,tot:tot,w:w,gap:w-tot,score:w>0?Math.round(Math.min(tot/w,1)*100):0,capNom:capNom,capReal:capReal,n:n,defl:defl,ann:ann,nf:nf};
+}
+var NAMES=[["gv","Gesetzliche Rente","--c1"],["bav","Betriebsrente","--c4"],["priv","Private Rente","--c5"],["oth","Weitere Einkünfte","--c3"],["cap","Kapital (Geldanlagen)","--c2"]];
+function posFv(t){return(S.pos||[]).reduce(function(a,p){return a+fv(p.s||0,p.r||0,p.y||0,t)},0)}
+function posUI(){$("#pos").innerHTML=(S.pos||[]).map(function(p){var t=PT[p.t]||PT.sonst,f=function(k,l,u){return '<div class="f"><label>'+l+'</label><div class="w"><input inputmode="decimal" data-f="'+k+'" aria-label="'+t[0]+' '+l+'" value="'+show(p[k])+'"><span>'+u+'</span></div></div>'};return '<div class="blk" data-id="'+p.id+'" style="--sw:var('+t[2]+')"><div class="bh"><b>'+t[0]+'</b><button class="x" type="button" data-rm="'+p.id+'">Entfernen</button></div><div class="row">'+f("s","Aktuell","€")+f("r","Sparrate","€/Mon.")+f("y","Rendite","% p. a.")+'</div></div>'}).join("")}
+function col(s){return s>=90?"var(--good)":s>=60?"var(--warn)":"var(--crit)"}
+function eff(){return S.rend-(S.cost||0)}
+var ET={welt:[6,0.2],misch:[4,0.3],anl:[2.5,0.15]};
+function fk(v){return v>=1e6?(v/1e6).toLocaleString("de-DE",{maximumFractionDigits:1})+" Mio. €":v>=1000?Math.round(v/1000).toLocaleString("de-DE")+" Tsd. €":Math.round(v)+" €"}
+function series(ret,ex,dr){var n=Math.max(0,ret-S.age),i=S.infl/100,out=[],t,im=Math.max(0,S.immo-S.kred);
+  for(t=0;t<=n;t++){var d=Math.pow(1+i,t);out.push({age:S.age+t,v:(fv(S.etf,S.rate+ex,eff()+(dr||0),t)+posFv(t)+(S.ui?im*d:0))/d})}
+  var c=calc(ret,ex,dr),rr=(1+PAY)/(1+i)-1,rm=Math.pow(1+rr,1/12)-1,pay=c.capReal/c.ann,bal=c.capReal,y,k;
+  for(y=1;y<=PLAN-ret;y++){for(k=0;k<12;k++)bal=bal*(1+rm)-pay;out.push({age:ret+y,v:Math.max(0,bal)})}
+  return{d:out,ret:ret,peak:c.capReal}}
+var CH=null;
+function chart(ok,ret,sr,diff){
+  var box=$("#ch");
+  if(!ok){box.innerHTML='<div class="hint">Bitte Alter und Rentenalter prüfen.</div>';$("#cl").innerHTML="";$("#rd").textContent="";CH=null;return}
+  var W=Math.max(280,box.clientWidth||320),H=W<480?230:270,m={l:64,r:12,t:24,b:26},ss=[{n:"Dein Plan",c:"var(--c1)",s:series(ret,0)}];
+  if(diff)ss.push({n:"Szenario",c:"var(--c4)",s:series(sr,S.ex)});
+  var x0=S.age,x1=Math.max(PLAN,S.age+1),vm=1,g="",v,a;
+  var BL=series(ret,0,-2),BH=series(ret,0,2);ss.concat([{s:BH}]).forEach(function(q){q.s.d.forEach(function(p){if(p.v>vm)vm=p.v})});
+  var raw=vm/4,mag=Math.pow(10,Math.floor(Math.log10(raw))),nn=raw/mag,st=(nn<=1?1:nn<=2?2:nn<=5?5:10)*mag,ym=Math.ceil(vm*1.05/st)*st;
+  var X=function(x){return m.l+(x-x0)/(x1-x0)*(W-m.l-m.r)},Y=function(y){return m.t+(1-y/ym)*(H-m.t-m.b)};
+  for(v=0;v<=ym+1e-6;v+=st)g+='<line x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(m.l-6)+'" y="'+(Y(v)+4)+'" text-anchor="end" class="ax">'+(v===0?"0 €":fk(v))+'</text>';
+  var xs=(x1-x0)>40?10:5;
+  for(a=Math.ceil(x0/xs)*xs;a<=x1;a+=xs)g+='<text x="'+X(a)+'" y="'+(H-7)+'" text-anchor="middle" class="ax">'+a+'</text>';
+  ss.forEach(function(q,k){var r=q.s.ret;g+='<line x1="'+X(r)+'" x2="'+X(r)+'" y1="'+m.t+'" y2="'+Y(0)+'" stroke="var(--ink2)" stroke-dasharray="3 4" opacity=".7"/>';if(k===0)g+='<text x="'+(X(r)+5)+'" y="'+(m.t-8)+'" class="ax">Rentenbeginn</text>'});
+  var bp=BH.d.map(function(p,i){return(i?"L":"M")+X(p.age).toFixed(1)+","+Y(p.v).toFixed(1)}).join("")+BL.d.slice().reverse().map(function(p){return"L"+X(p.age).toFixed(1)+","+Y(p.v).toFixed(1)}).join("")+"Z";g+='<path d="'+bp+'" fill="var(--c1)" opacity=".22"/>';
+  ss.slice().reverse().forEach(function(q){var d=q.s.d.map(function(p,i){return(i?"L":"M")+X(p.age).toFixed(1)+","+Y(p.v).toFixed(1)}).join("");
+    if(q===ss[0])g+='<path d="'+d+'L'+X(x1)+','+Y(0)+'L'+X(x0)+','+Y(0)+'Z" fill="'+q.c+'" opacity=".13"/>';
+    g+='<path d="'+d+'" fill="none" stroke="'+q.c+'" stroke-width="2.5" stroke-linejoin="round"/>'});
+  ss.forEach(function(q){g+='<circle cx="'+X(q.s.ret)+'" cy="'+Y(q.s.peak)+'" r="4.5" fill="'+q.c+'" stroke="var(--card)" stroke-width="2"/>'});
+  g+='<line id="xh" x1="0" x2="0" y1="'+m.t+'" y2="'+Y(0)+'" stroke="var(--ink)" opacity="0"/>';
+  box.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Vermögensverlauf" style="width:100%;height:auto;display:block">'+g+'</svg>';
+  $("#cl").innerHTML=ss.map(function(q){return '<span><i class="dot" style="--sw:'+q.c+'"></i>'+q.n+' · Höchststand '+fk(q.s.peak)+'</span>'}).join("")+'<span><i class="dot" style="--sw:var(--c1);opacity:.4"></i>Bandbreite: Rendite ±2 %-Punkte</span>';
+  $("#rd").textContent="Tippe ins Diagramm, um Werte je Alter zu sehen.";
+  CH={ss:ss,x0:x0,x1:x1,W:W,m:m,X:X,BL:BL,BH:BH};
+}
+function hov(e){if(!CH)return;var svg=$("#ch svg");if(!svg)return;var r=svg.getBoundingClientRect(),sx=(e.clientX-r.left)/r.width*CH.W,age=cl(Math.round(CH.x0+(sx-CH.m.l)/(CH.W-CH.m.l-CH.m.r)*(CH.x1-CH.x0)),CH.x0,CH.x1),xh=$("#xh");
+  xh.setAttribute("x1",CH.X(age));xh.setAttribute("x2",CH.X(age));xh.setAttribute("opacity",".5");
+  $("#rd").innerHTML="Alter <b>"+age+"</b>"+CH.ss.map(function(q){var p=q.s.d.filter(function(d){return d.age===age})[0];return " · "+q.n+": <b>"+(p?eur(p.v):"–")+"</b>"}).join("")+(function(){var l=CH.BL.d.filter(function(d){return d.age===age})[0],h=CH.BH.d.filter(function(d){return d.age===age})[0];return l&&h?" · Spanne "+eur(l.v)+" bis "+eur(h.v):""})()}
+function update(){
+  var ret=cl(Math.round(S.ret||67),50,75),sr=S.sr==null?cl(ret,63,70):S.sr;
+  PLAN=cl(Math.round(S.plan||90),Math.max(ret,sr)+5,110);
+  var a=calc(ret,0),b=calc(sr,S.ex),diff=sr!==ret||S.ex>0;
+  $("#demo").hidden=!S.demo;$("#se").value=S.ex;$("#sr").value=sr;$("#sev").textContent="+"+eur(S.ex)+" / Mon.";$("#srv").textContent=sr+" Jahre";
+  document.documentElement.style.setProperty("--st",col(a.score));
+  $("#arc").style.strokeDashoffset=326.7*(1-a.score/100);
+  var ok=S.age>=18&&ret>S.age;
+  $("#sc").textContent=a.w>0&&ok?a.score:"–";$("#tot").textContent=eur(a.tot);
+  var p=$("#pill");p.hidden=false;
+  p.textContent=!ok?"Rentenalter muss über deinem Alter liegen":a.w<=0?"Wunscheinkommen eintragen":a.gap>0.5?"Lücke: "+eur(a.gap)+" / Monat":"Gedeckt, +"+eur(-a.gap)+" Puffer";
+  var sc=Math.max(a.tot,a.w,1),sg=NAMES.filter(function(x){return a.by[x[0]]>0.5}).map(function(x){return '<span class="seg" style="width:'+a.by[x[0]]/sc*100+'%;--sw:var('+x[2]+')"></span>'});
+  if(a.w>0&&a.gap>0.5)sg.push('<span class="seg gap" style="width:'+a.gap/sc*100+'%"></span>');
+  $("#bar").innerHTML='<div class="track">'+sg.join("")+(a.w>0?'<span class="wish" style="left:calc('+a.w/sc*100+'% - 1px)"></span>':"")+'</div><div class="hint" style="margin-top:4px">'+NAMES.filter(function(x){return a.by[x[0]]>0.5}).map(function(x){return '<span style="margin-right:12px;white-space:nowrap"><i class="dot" style="--sw:var('+x[2]+')"></i>'+x[1]+' '+eur(a.by[x[0]])+'</span>'}).join("")+'</div>';
+  var tip=$("#tip");
+  if(ok&&a.w>0&&a.gap>0.5&&a.n>0){var f=fv(0,1,eff(),a.n),nd=Math.ceil(a.gap/a.nf*a.ann*a.defl/f/25)*25,ag=null,y;
+    for(y=63;y<=70;y++){if(calc(y,0).gap<=0){ag=y;break}}
+    var h="<span><b>Lücke schließen:</b> ca. <b>"+eur(nd)+"</b> mehr sparen pro Monat"+(ag&&ag>ret?" oder mit <b>"+ag+"</b> in Rente gehen":"")+".</span>";
+    if(nd<=1000)h+='<button class="btn p" type="button" id="try" data-v="'+nd+'">Im Regler testen</button>';
+    tip.innerHTML=h;tip.hidden=false;var t=$("#try");if(t)t.onclick=function(){S.ex=+t.dataset.v;S.sr=null;save();update();$("#se").scrollIntoView({behavior:"smooth",block:"center"})};
+  }else tip.hidden=true;
+  var d=function(x,y){var v=y-x;return Math.abs(v)<1?"unverändert":(v>0?"+":"−")+eur(Math.abs(v))};
+  $("#cmp").innerHTML='<div>Einkommen<b>'+eur(b.tot)+'</b>'+d(a.tot,b.tot)+'</div><div>'+(b.gap>0.5?"Lücke":"Puffer")+'<b>'+eur(Math.abs(b.gap))+'</b>'+(diff?"vorher "+(a.gap>0.5?eur(a.gap):"–"):"")+'</div><div>Score<b>'+(b.w>0?b.score:"–")+'</b>'+(diff?"vorher "+a.score:"")+'</div>';
+  $("#vn").textContent=eur(b.capNom);$("#vk").textContent=eur(b.capReal);
+  $("#quote").textContent=S.inc>0&&S.rate>=0?"Sparquote: "+(S.rate/S.inc*100).toLocaleString("de-DE",{maximumFractionDigits:1})+" % deines Nettoeinkommens"+(ok?" · noch "+(ret-S.age)+" Jahre bis zur Rente":""):"";
+  var im=Math.max(0,S.immo-S.kred),parts=[["ETFs und Fonds",S.etf,"--c1"],["Weitere Anlagen",(S.pos||[]).reduce(function(a,p){return a+(p.s||0)},0),"--c2"],["Immobilie (netto)",im,"--c3"]],T=parts.reduce(function(s,x){return s+x[1]},0);
+  var C=2*Math.PI*42,acc2=0,cnt=parts.filter(function(x){return x[1]>0}).length,sg2="";
+  parts.forEach(function(x){if(x[1]<=0||T<=0)return;var l=x[1]/T*C,gp=cnt>1?2.5:0;sg2+='<circle cx="60" cy="60" r="42" fill="none" stroke="var('+x[2]+')" stroke-width="16" stroke-dasharray="'+Math.max(0,l-gp)+' '+C+'" stroke-dashoffset="'+(-acc2)+'"><title>'+x[0]+': '+eur(x[1])+'</title></circle>';acc2+=l});
+  var te=eur(T);
+  $("#dn").innerHTML='<svg viewBox="0 0 120 120" role="img" aria-label="Vermögensverteilung"><circle cx="60" cy="60" r="42" fill="none" stroke="var(--in)" stroke-width="16"/><g transform="rotate(-90 60 60)">'+sg2+'</g><text x="60" y="54" text-anchor="middle" class="ax">Netto</text><text x="60" y="70" text-anchor="middle" style="font-size:'+(te.length>9?11:14)+'px;font-weight:700;fill:var(--ink)">'+te+'</text></svg>';
+  $("#lg").innerHTML=parts.map(function(x){return '<span><i class="dot" style="--sw:var('+x[2]+')"></i>'+x[0]+': <b>'+eur(x[1])+'</b>'+(T>0?' ('+Math.round(x[1]/T*100)+' %)':'')+'</span>'}).join("");
+  $("#etn").textContent="Rendite nach Kosten: "+eff().toLocaleString("de-DE",{maximumFractionDigits:2})+" % p. a. · Modellannahme, keine Prognose";
+  chart(ok,ret,sr,diff);
+}
+document.addEventListener("input",function(e){var el=e.target;if(!el.dataset.k)return;S.demo=0;S[el.dataset.k]=num(el.value);if(el.dataset.k==="ret")S.sr=null;if(el.dataset.k==="rend"||el.dataset.k==="cost"){S.et="eigene";$("#et").value="eigene"}save();update()});
+window.addEventListener("resize",function(){update()});
+$("#ch").addEventListener("pointermove",hov);$("#ch").addEventListener("pointerdown",hov);
+$("#et").onchange=function(){var v=this.value;S.et=v;if(ET[v]){S.rend=ET[v][0];S.cost=ET[v][1]}save();fill();update()};
+$("#uimmo").onchange=function(){S.ui=this.checked?1:0;save();update()};
+$("#se").oninput=function(){S.ex=+this.value;save();update()};
+$("#sr").oninput=function(){S.sr=+this.value;save();update()};
+function fill(){document.querySelectorAll("[data-k]").forEach(function(el){el.value=show(S[el.dataset.k])});$("#uimmo").checked=!!S.ui;$("#et").value=S.et||"eigene";posUI()}
+$("#bs").onclick=function(){S=sample();save();fill();update()};
+$("#bc").onclick=function(){S=blank();save();fill();update()};
+var TH="auto";try{TH=localStorage.getItem("rk4t")||"auto"}catch(e){}
+function applyTh(){var r=document.documentElement;if(TH==="light"||TH==="dark")r.setAttribute("data-theme",TH);else r.removeAttribute("data-theme");$("#bt").textContent=TH==="light"?"☀ Hell":TH==="dark"?"☾ Dunkel":"◐ Auto"}
+$("#bt").onclick=function(){TH=TH==="auto"?"light":TH==="light"?"dark":"auto";try{localStorage.setItem("rk4t",TH)}catch(e){}applyTh()};
+applyTh();
+var hp=$("#hp");
+$("#bh").onclick=function(){if(hp.showModal)hp.showModal();else hp.setAttribute("open","")};
+$("#hx").onclick=function(){if(hp.close)hp.close();else hp.removeAttribute("open")};
+hp.addEventListener("click",function(e){if(e.target===hp&&hp.close)hp.close()});
+var NK=["age","ret","wish","inc","gv","bav","priv","etf","spar","immo","kred","rate","infl","rend","cost","abz","plan","oth","ui","ex"];
+var msg=function(t){$("#dm").textContent=t};
+function cp(c){return(navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(c):Promise.reject()).then(function(){return true},function(){try{return document.execCommand("copy")}catch(e){return false}})}
+$("#dx").onclick=function(){var o={};NK.forEach(function(k){o[k]=S[k]});o.pos=S.pos||[];o.et=S.et||"eigene";var c="RK1:"+JSON.stringify(o);$("#dt").value=c;$("#dt").select();cp(c).then(function(ok){msg(ok?"Code kopiert. Speichere ihn z. B. in einer Notiz.":"Code erstellt. Bitte markieren, kopieren und irgendwo speichern.")})};
+$("#di").onclick=function(){var t=$("#dt").value.trim().replace(/^RK1:/,""),o;try{o=JSON.parse(t)}catch(e){msg("Das ist kein gültiger Sicherungscode.");return}
+  if(!o||typeof o!=="object"){msg("Das ist kein gültiger Sicherungscode.");return}
+  var n=blank(),c=0;NK.forEach(function(k){var v=o[k];if(typeof v==="number"&&isFinite(v)){n[k]=cl(v,0,1e9);c++}});
+  if(!c){msg("Keine passenden Werte gefunden.");return}
+  n.pos=Array.isArray(o.pos)?o.pos.slice(0,12).filter(function(p){return p&&PT[p.t]}).map(function(p){return{id:uid(),t:p.t,s:cl(+p.s||0,0,1e9),r:cl(+p.r||0,0,1e6),y:cl(+p.y||0,0,30)}}):(+o.spar>0?[{id:uid(),t:"tagesgeld",s:cl(+o.spar,0,1e9),r:0,y:2}]:[]);
+  n.et=["welt","misch","anl","eigene"].indexOf(o.et)>=0?o.et:"eigene";n.ui=n.ui?1:0;n.ex=cl(n.ex,0,1000);n.sr=null;
+  S=n;save();fill();update();msg("Daten übernommen.")};
+function splash(){var o=document.getElementById("sp");if(o)o.remove();
+  var t="",k,a,s,c,r1;for(k=0;k<12;k++){a=k*Math.PI/6;s=Math.sin(a);c=Math.cos(a);r1=k%3===0?40:44;t+='<line x1="'+(60+r1*s).toFixed(1)+'" y1="'+(60-r1*c).toFixed(1)+'" x2="'+(60+48*s).toFixed(1)+'" y2="'+(60-48*c).toFixed(1)+'" stroke="var(--ink2)" stroke-width="2"/>'}
+  var d=document.createElement("div");d.id="sp";d.setAttribute("aria-hidden","true");
+  d.innerHTML='<svg viewBox="0 0 120 120" width="140" height="140"><circle class="sr" cx="60" cy="60" r="52" fill="none" stroke="var(--acc)" stroke-width="3.5" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" style="transform:rotate(-90deg);transform-origin:60px 60px"/>'+t+'<g class="sn"><polygon points="60,18 69,60 51,60" fill="var(--acc)"/><polygon points="60,102 69,60 51,60" fill="var(--ink2)"/></g><circle cx="60" cy="60" r="4.5" fill="var(--bg)" stroke="var(--ink2)" stroke-width="1.5"/></svg><div class="st"><span>Renten</span><b>Kompass</b></div>';
+  var rm=function(){if(d.parentNode)d.remove()};d.onclick=rm;document.body.appendChild(d);setTimeout(rm,3200)}
+$("#logo").onclick=splash;
+var seen=false;try{seen=sessionStorage.getItem("rk4s")==="1";sessionStorage.setItem("rk4s","1")}catch(e){}
+$("#padd").innerHTML=Object.keys(PT).map(function(k){return '<button class="chip" type="button" data-add="'+k+'"><i class="dot" style="--sw:var('+PT[k][2]+')"></i>'+PT[k][0]+'</button>'}).join("");
+document.addEventListener("input",function(e){var el=e.target,f=el.dataset.f,b=el.closest(".blk");if(!f||!b)return;var p=(S.pos||[]).filter(function(x){return x.id===b.dataset.id})[0];if(!p)return;p[f]=num(el.value);S.demo=0;save();update()});
+document.addEventListener("click",function(e){var a=e.target.closest("[data-add]"),r=e.target.closest("[data-rm]");
+  if(a){S.pos=S.pos||[];S.pos.push({id:uid(),t:a.dataset.add,s:0,r:0,y:PT[a.dataset.add][1]});S.demo=0;save();posUI();update();var i=document.querySelector("#pos .blk:last-child input");if(i)i.focus()}
+  else if(r){S.pos=(S.pos||[]).filter(function(x){return x.id!==r.dataset.rm});save();posUI();update()}});
+fill();update();
+if(!seen)splash();
+})();
+</script>
+<script>
+if("serviceWorker" in navigator && /^https?:/.test(location.protocol)){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
+</script>
+</body></html>
