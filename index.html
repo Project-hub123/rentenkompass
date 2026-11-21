@@ -27,7 +27,7 @@ header{max-width:1000px;margin:0 auto;padding:16px 0;display:flex;justify-conten
 h2{margin:0;font-size:16px}h2 i{font-style:normal;color:var(--acc);margin-right:6px;font-size:13px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
 @media (max-width:760px){.grid{grid-template-columns:1fr}}
-.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;align-items:end}
 .f{display:flex;flex-direction:column;gap:3px;min-width:0}
 .f label{font-size:12.5px;color:var(--ink2)}
 .w{position:relative}
@@ -125,9 +125,10 @@ footer{max-width:1000px;margin:16px auto 0;font-size:12px;color:var(--ink2)}
   <div class="row">
     <div class="f"><label for="age">Alter heute</label><div class="w"><input id="age" data-k="age" inputmode="numeric"><span>J.</span></div></div>
     <div class="f"><label for="ret">Rente mit</label><div class="w"><input id="ret" data-k="ret" inputmode="numeric"><span>J.</span></div></div>
-    <div class="f"><label for="wish">Wunscheinkommen im Alter (netto)</label><div class="w"><input id="wish" data-k="wish" inputmode="decimal"><span>€/Mon.</span></div></div>
+    <div class="f"><label for="wish">Gewünschtes Einkommen in der Rente</label><div class="w"><input id="wish" data-k="wish" inputmode="decimal"><span>€/Mon.</span></div></div>
     <div class="f"><label for="inc">Nettoeinkommen heute</label><div class="w"><input id="inc" data-k="inc" inputmode="decimal"><span>€/Mon.</span></div></div>
   </div>
+  <div class="hint">Gewünscht = was dir pro Monat nach Steuern und Abgaben zum Leben bleiben soll, in heutigen Euro. Faustregel: etwa 70 bis 80 % deines heutigen Nettoeinkommens.</div>
   <div class="hint" id="quote"></div>
 </section>
 
@@ -199,13 +200,14 @@ footer{max-width:1000px;margin:16px auto 0;font-size:12px;color:var(--ink2)}
 </div>
 <dialog id="hp" aria-label="Hilfe"><div class="dh"><h2>Hilfe</h2><button class="btn" id="hx" type="button">Schließen</button></div>
 <details open><summary>Wo finde ich meine Werte?</summary><p>Gesetzliche Rente: Renteninformation der Deutschen Rentenversicherung (kommt jährlich per Post, auch online abrufbar). Dort stehen meist mehrere Beträge. Nimm den Betrag zur Regelaltersrente ohne angenommene Rentenanpassung, bei Unsicherheit den niedrigeren. Betriebs- und Privatrente: Standmitteilung deines Anbieters. Fehlt ein Wert, trage 0 ein oder lass das Feld leer.</p></details>
-<details><summary>Was bedeutet der Score?</summary><p>Er zeigt, wie viel deines Wunscheinkommens im Alter gedeckt ist. 100 heißt voll gedeckt. Grün ab 90, Gelb ab 60, darunter Rot.</p></details>
-<details><summary>Warum „heutige Kaufkraft“?</summary><p>Alle Beträge sind in heutigen Euro angegeben, die Inflation (Annahme: 2 % pro Jahr) ist herausgerechnet. So kannst du sie direkt mit deinem heutigen Wunscheinkommen vergleichen.</p></details>
+<details><summary>Was ist das gewünschte Einkommen?</summary><p>Der Betrag, der dir pro Monat in der Rente nach Steuern und Abgaben zum Leben bleiben soll, gerechnet in heutigen Euro. Als grobe Faustlinie gelten 70 bis 80 % deines heutigen Nettoeinkommens. Fallen Miete oder Kredit weg, reicht oft weniger. Das ist eine Orientierung, keine Vorgabe.</p></details>
+<details><summary>Was bedeutet der Score?</summary><p>Er zeigt, wie viel deines gewünschten Einkommens in der Rente gedeckt ist. 100 heißt voll gedeckt. Grün ab 90, Gelb ab 60, darunter Rot.</p></details>
+<details><summary>Warum „heutige Kaufkraft“?</summary><p>Alle Beträge sind in heutigen Euro angegeben, die Inflation (Annahme: 2 % pro Jahr) ist herausgerechnet. So kannst du sie direkt mit deinem heutigen gewünschten Einkommen vergleichen.</p></details>
 <details><summary>Wie genau ist die Rechnung?</summary><p>Es ist eine Modellrechnung. Rendite und Inflation sind Annahmen, die du unter „Annahmen“ ändern kannst. Steuern und Sozialabgaben sind nur als einstellbarer Pauschalabzug berücksichtigt, Fondskosten schon. Sie zeigt Größenordnungen, keine Prognose.</p></details>
 <details><summary>Wo werden meine Daten gespeichert?</summary><p>Nur im Browser auf diesem Gerät. Es gibt keinen Server und nichts wird übertragen. Für einen Gerätewechsel nutze „Daten sichern“ ganz unten.</p></details>
 <details><summary>Ist das eine Anlageberatung?</summary><p>Nein. Der RentenKompass gibt Orientierung, keine Beratung. Für konkrete Entscheidungen hilft z. B. die Verbraucherzentrale oder eine Rentenberatung.</p></details>
 </dialog>
-<footer>RentenKompass · Prototyp Version 7 · Marketing-Seminar WiSe 2026/27 · Eingaben bleiben in deinem Browser.</footer>
+<footer>RentenKompass · Prototyp Version 8 · Marketing-Seminar WiSe 2026/27 · Eingaben bleiben in deinem Browser.</footer>
 
 <script>
 (function(){
@@ -290,7 +292,7 @@ function update(){
   var ok=S.age>=18&&ret>S.age;
   $("#sc").textContent=a.w>0&&ok?a.score:"–";$("#tot").textContent=eur(a.tot);
   var p=$("#pill");p.hidden=false;
-  p.textContent=!ok?"Rentenalter muss über deinem Alter liegen":a.w<=0?"Wunscheinkommen eintragen":a.gap>0.5?"Lücke: "+eur(a.gap)+" / Monat":"Gedeckt, +"+eur(-a.gap)+" Puffer";
+  p.textContent=!ok?"Rentenalter muss über deinem Alter liegen":a.w<=0?"Gewünschtes Einkommen eintragen":a.gap>0.5?"Lücke: "+eur(a.gap)+" / Monat":"Gedeckt, +"+eur(-a.gap)+" Puffer";
   var sc=Math.max(a.tot,a.w,1),sg=NAMES.filter(function(x){return a.by[x[0]]>0.5}).map(function(x){return '<span class="seg" style="width:'+a.by[x[0]]/sc*100+'%;--sw:var('+x[2]+')"></span>'});
   if(a.w>0&&a.gap>0.5)sg.push('<span class="seg gap" style="width:'+a.gap/sc*100+'%"></span>');
   $("#bar").innerHTML='<div class="track">'+sg.join("")+(a.w>0?'<span class="wish" style="left:calc('+a.w/sc*100+'% - 1px)"></span>':"")+'</div><div class="hint" style="margin-top:4px">'+NAMES.filter(function(x){return a.by[x[0]]>0.5}).map(function(x){return '<span style="margin-right:12px;white-space:nowrap"><i class="dot" style="--sw:var('+x[2]+')"></i>'+x[1]+' '+eur(a.by[x[0]])+'</span>'}).join("")+'</div>';
